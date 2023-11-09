@@ -19,9 +19,6 @@ def load_data_fashion_mnist(batch_size, resize = None):
            data.DataLoader(mnist_test, batch_size, shuffle = False, num_workers = 4))
 
 
-from IPython import display
-
-
 def softmax(X):
     X_exp = torch.exp(X)
     partition = X_exp.sum(1,keepdim=True)
