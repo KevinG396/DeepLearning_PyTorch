@@ -152,3 +152,19 @@ def train_gpu(net, train_iter, test_iter, num_epochs, lr, device):
         print("Avg loss: "+str(metric[0]/metric[2]) + "    " 
           +"    ACC: "+str(metric[1]/metric[2]))
     print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, test acc {test_acc:.3f}')
+
+def train_batch_gpu(net, X, y, loss, trainer, devices):
+    if isinstance(X, list):
+        X = [x.to(devices[0]) for x in X]
+    else:
+        X = X.to(devices[0])
+    y = y.to(devices[0])
+    net.train()
+    trainer.zero_grad()
+    pred = net(X)
+    l = loss(pred, y)
+    l.sum().backward()
+    trainer.step()
+    train_loss_sum = l.sum()
+    train_acc_sum = accuracy(pred, y)
+    return train_loss_sum, train_acc_sum
