@@ -97,7 +97,7 @@ def train_epoch(W,b,lr, net, train_iter, loss, updater):
 
 def train(W,b,lr,net, train_iter, test_iter, loss, num_epochs,updater):
     for epoch in range(num_epochs):
-        train_metrics = train_epoch_ch3(W,b,lr,net, train_iter, loss, updater)
+        train_metrics = train_epoch(W,b,lr,net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(W,b,net, test_iter)
     train_loss, train_iter = train_metrics
     print("test_acc: "+str(test_acc))
