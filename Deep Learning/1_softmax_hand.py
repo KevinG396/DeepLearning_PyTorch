@@ -2,7 +2,6 @@ import torch
 import torchvision
 from torch.utils import data
 from torchvision import transforms
-from d2l import torch as d2l
 
 def load_data_fashion_mnist(batch_size, resize = None):
     trans = [transforms.ToTensor()]
@@ -27,6 +26,12 @@ def softmax(X):
 # a regression model
 def net(W,b,X):
     return softmax(torch.matmul(X.reshape((-1, W.shape[0])),W)+b) #-1 means let program to self-calculate
+
+def sgd(params, lr, batch_size):
+    with torch.no_grad():
+        for param in params:
+            param -= lr * param.grad / batch_size
+            param.grad.zero_()
 
 
 #y = torch.tensor([0,2])   # catagory number of target vector
@@ -67,7 +72,7 @@ def evaluate_accuracy(W,b,net,data_iter):
         metric.add(accuracy(net(W,b,X),y), y.numel()) # calculate right pred and total(y.numel())
     return metric[0] / metric[1]   # right pred / total
 
-def train_epoch_ch3(W,b,lr, net, train_iter, loss, updater):
+def train_epoch(W,b,lr, net, train_iter, loss, updater):
     if isinstance(net, torch.nn.Module): 
         net.train()    # start training mode
     metric = Accumulator(3) 
@@ -90,7 +95,7 @@ def train_epoch_ch3(W,b,lr, net, train_iter, loss, updater):
           +"    ACC: "+str(metric[1]/metric[2]))
     return metric[0]/metric[2], metric[1]/metric[2]  # Sum_loss / sample: avg_loss; accurate num/sample: accuracy
 
-def train_ch3(W,b,lr,net, train_iter, test_iter, loss, num_epochs,updater):
+def train(W,b,lr,net, train_iter, test_iter, loss, num_epochs,updater):
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(W,b,lr,net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(W,b,net, test_iter)
@@ -99,7 +104,7 @@ def train_ch3(W,b,lr,net, train_iter, test_iter, loss, num_epochs,updater):
 
 
 def updater(W,b,lr,batch_size):
-    return d2l.sgd([W,b], lr,batch_size)
+    return sgd([W,b], lr,batch_size)
 
 if __name__=='__main__':
 
@@ -111,4 +116,4 @@ if __name__=='__main__':
     W1 = torch.normal(0,0.01,size=(num_inputs1, num_outputs1), requires_grad = True)
     b1 = torch.zeros(num_outputs1, requires_grad = True)
     train_iter1, test_iter1 = load_data_fashion_mnist(batch_size1)
-    train_ch3(W1, b1, lr1, net, train_iter1, test_iter1, cross_entropy, num_epochs1, updater)
+    train(W1, b1, lr1, net, train_iter1, test_iter1, cross_entropy, num_epochs1, updater)
