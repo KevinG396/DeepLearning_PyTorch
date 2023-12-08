@@ -1,4 +1,4 @@
-# Learning_PyTorch
+# Deep Learning with PyTorch
 Learning Deep Learning with Pytorch framework
 
 ## Deep Learning
